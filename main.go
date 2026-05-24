@@ -28,7 +28,7 @@ func main() {
 	r := gin.Default()
 	routes.SetupRoutes(r, authHandler)
 
-	port := os.Getenv("DB_PORT")
+	port := os.Getenv("APP_PORT")
 	log.Printf("server running on port %s", port)
 	if err := r.Run(":" + port); err != nil {
 		log.Fatalf("error running server: %v", err)
