@@ -33,10 +33,10 @@ func (h *AuthHandler) Register(ctx *gin.Context) {
 	}
 
 	if req.Role == "" {
-		req.Role = domain.RoleUser
+		req.Role = domain.RoleEmployee
 	}
 
-	if err := h.service.Register(req.Username, req.Password, req.Role); err != nil {
+	if err := h.service.Register(req); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -54,7 +54,7 @@ func (h *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	user, err := h.service.Login(req.Username, req.Password)
+	user, err := h.service.Login(req)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 	}

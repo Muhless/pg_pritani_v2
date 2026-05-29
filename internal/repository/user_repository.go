@@ -10,6 +10,7 @@ type UserRepository interface {
 	Create(user *domain.User) error
 	FindById(id uint) (*domain.User, error)
 	FindByUsername(username string) (*domain.User, error)
+	FindAll() ([]*domain.User, error)
 	Update(user *domain.User) error
 	Delete(id uint) error
 }
@@ -48,6 +49,12 @@ func (r *userRepository) FindByUsername(username string) (*domain.User, error) {
 		return nil, err
 	}
 	return &user, err
+}
+
+func (r *userRepository) FindAll() ([]*domain.User, error) {
+	var users []*domain.User
+	err := r.db.Find(&users).Error
+	return users, err
 }
 
 func (r *userRepository) Update(user *domain.User) error {

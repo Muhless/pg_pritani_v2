@@ -21,8 +21,8 @@ func main() {
 	database := db.ConnectDB()
 
 	// repo
-	authRepo := repository.NewAuthRepository(database)
-	authService := service.NewAuthService(authRepo)
+	userRepo := repository.NewUserRepository(database)
+	authService := service.NewAuthService(database, userRepo)
 	authHandler := handler.NewAuthHandler(authService)
 
 	r := gin.Default()

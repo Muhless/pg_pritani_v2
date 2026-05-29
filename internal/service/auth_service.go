@@ -11,8 +11,8 @@ import (
 )
 
 type AuthService interface {
-	Register(username, password string, role domain.Role) error
-	Login(username, password string) (*domain.User, error)
+	Register(req dto.RegisterRequest) error
+	Login(req dto.LoginRequest) (*domain.User, error)
 }
 
 type authService struct {
@@ -47,13 +47,13 @@ func (s *authService) Register(req dto.RegisterRequest) error {
 	})
 }
 
-func (s *authService) Login(username, password string) (*domain.User, error) {
-	user, err := s.repo.FindByUsername(username)
+func (s *authService) Login(req dto.LoginRequest) (*domain.User, error) {
+	user, err := s.repo.FindByUsername(req.Username)
 	if err != nil {
 		return nil, errors.New("username not found")
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 
 	return user, nil
 }
