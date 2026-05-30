@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"pg_pritani/backend/internal/db"
 	"pg_pritani/backend/internal/handler"
@@ -11,26 +10,34 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
+	zerolog.SetGlobalLevel(zerolog.InfoLevel)
 
 	if err := godotenv.Load(); err != nil {
-		log.Fatalf("error loading .env")
+		log.Fatal().Msg("error loading .env")
 	}
+
 	database := db.ConnectDB()
 
-	// repo
 	userRepo := repository.NewUserRepository(database)
 	authService := service.NewAuthService(database, userRepo)
 	authHandler := handler.NewAuthHandler(authService)
 
+	userService := service.NewUserService(userRepo)
+	userHandler := handler.NewUserHandler(userService)
+
 	r := gin.Default()
-	routes.SetupRoutes(r, authHandler)
+	routes.SetupRoutes(r, authHandler, userHandler)
 
 	port := os.Getenv("APP_PORT")
-	log.Printf("server running on port %s", port)
+	log.Info().Str("port", port).Msg("server running")
+
 	if err := r.Run(":" + port); err != nil {
-		log.Fatalf("error running server: %v", err)
+		log.Fatal().Err(err).Msg("error running server")
 	}
 }

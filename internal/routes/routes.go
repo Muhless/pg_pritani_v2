@@ -9,7 +9,18 @@ import (
 func SetupRoutes(
 	r *gin.Engine,
 	authHandler *handler.AuthHandler,
+	userHandler *handler.UserHandler,
 ) {
-	r.POST("/auth/register", authHandler.Register)
-	r.POST("/auth/login", authHandler.Login)
+	auth := r.Group("/auth")
+	{
+		auth.POST("/register", authHandler.Register)
+		auth.POST("/auth/login", authHandler.Login)
+	}
+	user := r.Group("/user")
+	{
+		user.GET("", userHandler.GetAll)
+		user.GET("/:id", userHandler.GetByID)
+		user.PATCH("/:id",userHandler.Update)
+		user.DELETE("/:id",userHandler.Delete)
+	}
 }
