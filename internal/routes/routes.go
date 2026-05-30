@@ -10,6 +10,7 @@ func SetupRoutes(
 	r *gin.Engine,
 	authHandler *handler.AuthHandler,
 	userHandler *handler.UserHandler,
+	adminHandler *handler.AdminHandler,
 ) {
 	auth := r.Group("/auth")
 	{
@@ -20,7 +21,15 @@ func SetupRoutes(
 	{
 		user.GET("", userHandler.GetAll)
 		user.GET("/:id", userHandler.GetByID)
-		user.PATCH("/:id",userHandler.Update)
-		user.DELETE("/:id",userHandler.Delete)
+		user.PATCH("/:id", userHandler.Update)
+		user.DELETE("/:id", userHandler.Delete)
+	}
+
+	admin := r.Group("/admin")
+	{
+		admin.GET("", adminHandler.GetAll)
+		admin.GET("/:id", adminHandler.GetByID)
+		admin.PATCH("/:id", adminHandler.Update)
+		admin.DELETE("/:id", adminHandler.Delete)
 	}
 }

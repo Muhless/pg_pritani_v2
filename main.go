@@ -31,8 +31,12 @@ func main() {
 	userService := service.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
 
+	adminRepo := repository.NewAdminRepository(database)
+	adminService := service.NewAdminService(adminRepo)
+	adminHandler := handler.NewAdminHandler(adminService)
+
 	r := gin.Default()
-	routes.SetupRoutes(r, authHandler, userHandler)
+	routes.SetupRoutes(r, authHandler, userHandler, adminHandler)
 
 	port := os.Getenv("APP_PORT")
 	log.Info().Str("port", port).Msg("server running")
