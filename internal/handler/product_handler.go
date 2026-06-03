@@ -37,7 +37,7 @@ func (h *ProductHandler) GetByID(ctx *gin.Context) {
 
 	product, err := h.product.GetByID(uint(id))
 	if err != nil {
-		log.Error().Err(err).Msg("")
+		log.Error().Err(err).Msg("handler: failed to ger product by id")
 		ctx.JSON(http.StatusNotFound, gin.H{"error": "failed to get product by id"})
 		return
 	}
@@ -47,7 +47,8 @@ func (h *ProductHandler) GetByID(ctx *gin.Context) {
 func (h *ProductHandler) Create(ctx *gin.Context) {
 	var req dto.CreateProductRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "failed to create product data"})
+		log.Error().Err(err).Msg("handler: invalid request body")
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
