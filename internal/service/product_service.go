@@ -76,6 +76,7 @@ func (s *productService) Update(id uint, req dto.UpdateProductRequest) error {
 
 	if product == nil {
 		log.Warn().Uint("id", id).Msg("product not found")
+		return errors.New("product not found")
 	}
 
 	product.Name = req.Name
@@ -85,7 +86,7 @@ func (s *productService) Update(id uint, req dto.UpdateProductRequest) error {
 	product.Photo = req.Photo
 
 	if err := s.repo.Update(product); err != nil {
-		log.Error().Err(err).Uint("id", id).Msg("failed to updatee product data")
+		log.Error().Err(err).Uint("id", id).Msg("failed to update product data")
 		return err
 	}
 	log.Info().Uint("id", id).Msg("product data successfully updated")

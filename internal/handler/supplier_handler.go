@@ -66,10 +66,11 @@ func (h *SupplierHandler) Create(ctx *gin.Context) {
 }
 
 func (h *SupplierHandler) Update(ctx *gin.Context) {
-	id, err := strconv.ParseUint(ctx.Param("id"), 10, 24)
+	id, err := strconv.ParseUint(ctx.Param("id"), 10, 64)
 	if err != nil {
 		log.Error().Err(err).Msg("invalid id")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid id"})
+		return
 	}
 
 	var req dto.UpdateSupplierRequest

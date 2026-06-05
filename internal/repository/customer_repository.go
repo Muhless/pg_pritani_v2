@@ -2,7 +2,6 @@ package repository
 
 import (
 	"pg_pritani/backend/internal/domain"
-	"pg_pritani/backend/internal/dto"
 
 	"gorm.io/gorm"
 )
@@ -10,8 +9,8 @@ import (
 type CustomerRepository interface {
 	FindAll() ([]*domain.Customer, error)
 	FindByID(id uint) (*domain.Customer, error)
-	Create(req dto.CreateCustomerRequest) error
-	Update(req dto.UpdateCustomerRequest) error
+	Create(customer *domain.Customer) error
+	Update(customer *domain.Customer) error
 	Delete(id uint) error
 }
 
@@ -44,12 +43,12 @@ func (r *customerRepository) FindByID(id uint) (*domain.Customer, error) {
 	return &customer, nil
 }
 
-func (r *customerRepository) Create(req dto.CreateCustomerRequest) error {
-	return r.db.Create(req).Error
+func (r *customerRepository) Create(customer *domain.Customer) error {
+	return r.db.Create(customer).Error
 }
 
-func (r *customerRepository) Update(req dto.UpdateCustomerRequest) error {
-	return r.db.Save(req).Error
+func (r *customerRepository) Update(customer *domain.Customer) error {
+	return r.db.Save(customer).Error
 }
 
 func (r *customerRepository) Delete(id uint) error {
