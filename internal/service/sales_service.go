@@ -72,7 +72,7 @@ func (s *salesService) Create(req dto.CreateSalesRequest) error {
 				return err
 			}
 			if product == nil {
-				errors.New("product not found")
+				return errors.New("product not found")
 			}
 
 			if product.Stock < item.Quantity {
@@ -122,4 +122,46 @@ func (s *salesService) Create(req dto.CreateSalesRequest) error {
 		log.Info().Uint("id", sales.ID).Float64("total", totalPrice).Msg("successfully created sales data")
 		return nil
 	})
+}
+
+func (s *salesService) AddPayment(id uint, req dto.UpdateSalesStatusRequest) error {
+	sales, err := s.salesRepo.FindByID(id)
+	if err != nil {
+		return err
+	}
+	if sales == nil {
+		return errors.New("sales not found")
+	}
+	if sales.Status == domain.SalesStatusPaid {
+		return errors.New("sales alrready paid")
+	}
+	if sales.Status == domain.SalesStatusCancelled {
+		return errors.New("sales is cancelled")
+	}
+
+	sales.PaidAmount = req.PaidAmount
+	sales.RemainingAmount = sales.TotalPrice - sales.PaidAmount
+
+	if sales.PaidAmount >= sales.TotalPrice {
+		sales.Status = domain.SalesStatusPaid
+		sales.RemainingAmount = 0
+	} else {
+		sales.Status = domain.SalesStatusPartial
+	}
+
+	if err := s.salesRepo.Update(sales); err != nil {
+		log.Error().Err(err).Uint("id", id).Msg("failed to add payment")
+		return err
+	}
+
+	log.Info().Uint("id", id).Msg("successfully add payment")
+	return nil
+}
+
+func (s *salesService) Delete(id uint) error {
+	if err := s.salesRepo.Delete(id); err != nil {
+		log.Error().Err(err).Uint("id", id).Msg("failed to delete sales data")
+		return err
+	}
+	return nil
 }

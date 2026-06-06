@@ -15,6 +15,7 @@ func SetupRoutes(
 	productHandler *handler.ProductHandler,
 	supplierHandler *handler.SupplierHandler,
 	customerHandler *handler.CustomerHandler,
+	salesHandler *handler.SalesHandler,
 ) {
 	auth := r.Group("/auth")
 	{
@@ -70,6 +71,16 @@ func SetupRoutes(
 		customer.POST("", customerHandler.Create)
 		customer.PATCH("/:id", customerHandler.Update)
 		customer.DELETE("/:id", customerHandler.Delete)
+
+	}
+
+	sales := r.Group("/sales")
+	{
+		sales.GET("", salesHandler.GetAll)
+		sales.GET("/:id", salesHandler.GetByID)
+		sales.POST("", salesHandler.Create)
+		sales.POST("/:id/payment", salesHandler.AddPayment)
+		sales.DELETE("/:id", salesHandler.Delete)
 
 	}
 }

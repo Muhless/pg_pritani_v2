@@ -1,7 +1,5 @@
 package dto
 
-import "time"
-
 type SalesItemRequest struct {
 	ProductID uint `json:"product_id"`
 	Quantity  int  `json:"quantity"`
@@ -10,7 +8,7 @@ type SalesItemRequest struct {
 type CreateSalesRequest struct {
 	CustomerID *uint              `json:"customer_id"`
 	PaidAmount float64            `json:"paid_amount"`
-	Date       string        `json:"date"`
+	Date       string             `json:"date"`
 	Items      []SalesItemRequest `json:"items"`
 }
 
