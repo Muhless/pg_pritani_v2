@@ -24,4 +24,5 @@ type Sales struct {
 	RemainingAmount float64     `json:"remaining_amount" gorm:"type:numeric(10,2)"`
 	Status          SalesStatus `json:"status" gorm:"not null;default:'pending'"`
 	Date            time.Time   `json:"date" gorm:"not null"`
+	Items           []SalesItem `json:"items" gorm:"foreignKey:SalesID"`
 }
