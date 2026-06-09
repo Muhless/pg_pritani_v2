@@ -55,8 +55,12 @@ func main() {
 	salesService := service.NewSalesService(database, salesRepo, productRepo)
 	salesHandler := handler.NewSalesHandler(salesService)
 
+	paymentRepo := repository.NewPaymentRepository(database)
+	paymentService := service.NewPaymentService(database, paymentRepo, salesRepo)
+	paymentHandler := handler.NewPaymentHandler(paymentService)
+
 	r := gin.Default()
-	routes.SetupRoutes(r, authHandler, userHandler, adminHandler, employeeHandler, productHandler, supplierHandler, customerHandler, salesHandler)
+	routes.SetupRoutes(r, authHandler, userHandler, adminHandler, employeeHandler, productHandler, supplierHandler, customerHandler, salesHandler, paymentHandler)
 
 	port := os.Getenv("APP_PORT")
 	log.Info().Str("port", port).Msg("server running")
