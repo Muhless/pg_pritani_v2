@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"pg_pritani/backend/internal/dto"
 	"pg_pritani/backend/internal/service"
+	"pg_pritani/backend/pkg/pagination"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -19,13 +20,17 @@ func NewPaymentHandler(service service.PaymentService) *PaymentHandler {
 }
 
 func (h *PaymentHandler) GetAll(ctx *gin.Context) {
-	payments, err := h.service.GetAll()
+	p := pagination.GetPagination(ctx)
+
+	payments, total, err := h.service.GetAll(p.Page, p.Limit)
 	if err != nil {
 		log.Error().Err(err).Msg("handler: failed to get all payments data")
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get all payments data"})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"data": payments})
+
+	p.Total = float64(total)
+	ctx.JSON(http.StatusOK, gin.H{"data": payments, "pagination": p})
 }
 
 func (h *PaymentHandler) GetByID(ctx *gin.Context) {

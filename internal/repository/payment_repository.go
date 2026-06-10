@@ -7,7 +7,7 @@ import (
 )
 
 type PaymentRepository interface {
-	FindAll() ([]*domain.Payment, error)
+	FindAll(page, limit, offset int) ([]*domain.Payment, int64, error)
 	FindByID(id uint) (*domain.Payment, error)
 	FindBySalesID(salesID uint) ([]*domain.Payment, error)
 	Create(payment *domain.Payment) error
@@ -22,10 +22,15 @@ func NewPaymentRepository(db *gorm.DB) PaymentRepository {
 	return &paymentRepository{db}
 }
 
-func (r *paymentRepository) FindAll() ([]*domain.Payment, error) {
+func (r *paymentRepository) FindAll(page, limit, offset int) ([]*domain.Payment, int64, error) {
 	var payments []*domain.Payment
-	err := r.db.Preload("Sales").Find(&payments).Error
-	return payments, err
+	var total int64
+
+	if err := r.db.Model(&domain.Payment{}).Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+	err := r.db.Limit(limit).Offset(offset).Preload("Sales").Find(&payments).Error
+	return payments, total, err
 }
 
 func (r *paymentRepository) FindByID(id uint) (*domain.Payment, error) {

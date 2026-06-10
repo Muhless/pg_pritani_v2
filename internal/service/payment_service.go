@@ -11,7 +11,7 @@ import (
 )
 
 type PaymentService interface {
-	GetAll() ([]*domain.Payment, error)
+	GetAll(page, limit int) ([]*domain.Payment, int64, error)
 	GetByID(id uint) (*domain.Payment, error)
 	GetBySalesID(salesID uint) ([]*domain.Payment, error)
 	Create(req dto.CreatePaymentRequest) error
@@ -28,14 +28,15 @@ func NewPaymentService(db *gorm.DB, paymentRepo repository.PaymentRepository, sa
 	return &paymentService{db, paymentRepo, salesRepo}
 }
 
-func (s *paymentService) GetAll() ([]*domain.Payment, error) {
-	payments, err := s.paymentRepo.FindAll()
+func (s *paymentService) GetAll(page, limit int) ([]*domain.Payment, int64, error) {
+	offset := (page - 1) * limit
+	payments, total, err := s.paymentRepo.FindAll(page, limit, offset)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get all payments data")
-		return nil, err
+		return nil, 0, err
 	}
 
-	return payments, err
+	return payments, total, err
 }
 
 func (s *paymentService) GetByID(id uint) (*domain.Payment, error) {
