@@ -1,1 +1,1 @@
-DROP TABLE IF EXISTS sales_items;
+DROP TABLE IF EXISTS sales_items;  

@@ -10,7 +10,7 @@ import (
 )
 
 type ProductService interface {
-	GetAll() ([]*domain.Product, error)
+	GetAll(page, limit int) ([]*domain.Product, int64, error)
 	GetByID(id uint) (*domain.Product, error)
 	Create(req dto.CreateProductRequest) error
 	Update(id uint, req dto.UpdateProductRequest) error
@@ -25,13 +25,14 @@ func NewProductService(repo repository.ProductRepository) ProductService {
 	return &productService{repo}
 }
 
-func (s *productService) GetAll() ([]*domain.Product, error) {
-	products, err := s.repo.FindAll()
+func (s *productService) GetAll(page, limit int) ([]*domain.Product, int64, error) {
+	offset := (page - 1) * limit
+	products, total, err := s.repo.FindAll(page, limit, offset)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get all products data")
-		return nil, err
+		return nil, 0, err
 	}
-	return products, nil
+	return products, total, nil
 }
 
 func (s *productService) GetByID(id uint) (*domain.Product, error) {

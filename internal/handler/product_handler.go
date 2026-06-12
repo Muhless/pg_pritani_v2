@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"pg_pritani/backend/internal/dto"
 	"pg_pritani/backend/internal/service"
+	"pg_pritani/backend/pkg/pagination"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -19,13 +20,17 @@ func NewProductHandler(product service.ProductService) *ProductHandler {
 }
 
 func (h *ProductHandler) GetAll(ctx *gin.Context) {
-	products, err := h.product.GetAll()
+	p := pagination.GetPagination(ctx)
+	products, total, err := h.product.GetAll(p.Page, p.Limit)
+
 	if err != nil {
 		log.Error().Err(err).Msg("handler: failed to get all product")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "failed to get all product"})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"data": products})
+
+	p.Total = float64(total)
+	ctx.JSON(http.StatusOK, gin.H{"data": products, "pagination": p})
 }
 
 func (h *ProductHandler) GetByID(ctx *gin.Context) {
