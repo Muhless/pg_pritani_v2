@@ -11,7 +11,7 @@ import (
 )
 
 type DiscountService interface {
-	GetAll(page, limit, offset int) ([]*domain.Discount, error)
+	GetAll(page, limit int) ([]*domain.Discount,int64, error)
 	GetByID(id uint) (*domain.Discount, error)
 	Create(req dto.CreateDiscountRequest) error
 	Update(id uint, req dto.UpdateDiscountRequest) error
@@ -26,8 +26,8 @@ func NewDiscountService(repo repository.DiscountRepository) DiscountService {
 	return &discountService{repo}
 }
 
-func (s *discountService) GetAll(page, limit, offset int) ([]*domain.Discount, int64, error) {
-	offset = (page - 1) * limit
+func (s *discountService) GetAll(page, limit int) ([]*domain.Discount, int64, error) {
+	offset := (page - 1) * limit
 	discounts, total, err := s.repo.FindAll(page, limit, offset)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to get all discounts data")

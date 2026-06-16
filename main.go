@@ -51,8 +51,12 @@ func main() {
 	customerService := service.NewCustomerService(customerRepo)
 	customerHandler := handler.NewCustomerHandler(customerService)
 
+	discountRepo := repository.NewDiscountRepository(database)
+	discountService := service.NewDiscountService(discountRepo)
+	discountHandler := handler.NewDiscountHandler(discountService)
+
 	salesRepo := repository.NewSalesRepository(database)
-	salesService := service.NewSalesService(database, salesRepo, productRepo)
+	salesService := service.NewSalesService(database, salesRepo, productRepo, discountRepo)
 	salesHandler := handler.NewSalesHandler(salesService)
 
 	paymentRepo := repository.NewPaymentRepository(database)
@@ -60,7 +64,7 @@ func main() {
 	paymentHandler := handler.NewPaymentHandler(paymentService)
 
 	r := gin.Default()
-	routes.SetupRoutes(r, authHandler, userHandler, adminHandler, employeeHandler, productHandler, supplierHandler, customerHandler, salesHandler, paymentHandler)
+	routes.SetupRoutes(r, authHandler, userHandler, adminHandler, employeeHandler, productHandler, supplierHandler, customerHandler, salesHandler, paymentHandler, discountHandler)
 
 	port := os.Getenv("APP_PORT")
 	log.Info().Str("port", port).Msg("server running")

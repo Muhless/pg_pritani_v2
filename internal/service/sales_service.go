@@ -20,17 +20,19 @@ type SalesService interface {
 }
 
 type salesService struct {
-	db          *gorm.DB
-	salesRepo   repository.SalesRepository
-	productRepo repository.ProductRepository
+	db           *gorm.DB
+	salesRepo    repository.SalesRepository
+	productRepo  repository.ProductRepository
+	discountRepo repository.DiscountRepository
 }
 
 func NewSalesService(
 	db *gorm.DB,
 	salesRepo repository.SalesRepository,
 	productRepo repository.ProductRepository,
+	discountRepo repository.DiscountRepository,
 ) SalesService {
-	return &salesService{db, salesRepo, productRepo}
+	return &salesService{db, salesRepo, productRepo, discountRepo}
 }
 
 func (s *salesService) GetAll() ([]*domain.Sales, error) {
@@ -81,6 +83,16 @@ func (s *salesService) Create(req dto.CreateSalesRequest) error {
 			}
 
 			subtotal := product.Price * float64(item.Quantity)
+
+			discount, _ := s.discountRepo.FindByActiveProductID(item.ProductID)
+			if discount != nil {
+				if discount.Type == domain.DiscountTypePercentage {
+					subtotal -= subtotal * (discount.Value / 100)
+				} else {
+					subtotal -= discount.Value * float64(item.Quantity)
+				}
+			}
+
 			totalPrice += subtotal
 
 			items = append(items, domain.SalesItem{
